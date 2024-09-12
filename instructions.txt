@@ -4,10 +4,6 @@ chmod +x SVDSS_linux_x86-64
 
 ./SVDSS_linux_x86-64 --help
 
-wget https://github.com/silviacambiago/files/archive/refs/heads/main.zip
-
-unzip main.zip
-
 ./SVDSS_linux_x86-64 index --reference reference.fa --index index.fmd
 
 ./SVDSS_linux_x86-64 search --index index.fmd --fastx target.fa --bsize 10 > specifics.txt

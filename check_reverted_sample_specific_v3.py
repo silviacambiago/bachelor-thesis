@@ -129,32 +129,58 @@ def revert_and_complement(string):
     return reverse_complement
 
 
+def kmp_prefix_function(pattern):
+    """
+    This function preprocesses the pattern to create the prefix (partial match) table.
+    """
+    m = len(pattern)
+    lps = [0] * m  # Longest prefix suffix (LPS) array
+    j = 0  # Length of the previous longest prefix suffix
+    i = 1
+
+    while i < m:
+        if pattern[i] == pattern[j]:
+            j += 1
+            lps[i] = j
+            i += 1
+        else:
+            if j != 0:
+                j = lps[j - 1]
+            else:
+                lps[i] = 0
+                i += 1
+
+    return lps
+
+
 def check_substring(reference, string):
     """
-    Checks if a string is a substring of another string using a suffix array and returns the starting index.
-
-    Args:
-    reference (str): The string to search within.
-    string (str): The string to search for.
-
-    Returns:
-    tuple: A tuple containing:
-           - bool: True if the string is found within the reference string, False otherwise.
-           - int: The starting index of the substring if found, -1 otherwise.
+    Knuth-Morris-Pratt string matching algorithm.
+    Returns True and the index of the first occurrence if the pattern is found, else returns False and -1.
     """
-    suffix_array = sorted([(reference[i:], i) for i in range(len(reference))])
+    n = len(reference)
+    m = len(string)
 
-    left, right = 0, len(suffix_array)
-    while left < right:
-        mid = (left + right) // 2
-        if suffix_array[mid][0] < string:
-            left = mid + 1
-        else:
-            right = mid
+    # Preprocess the pattern to get the longest prefix suffix array
+    lps = kmp_prefix_function(string)
 
-    if left < len(suffix_array) and suffix_array[left][0].startswith(string):
-        return True, suffix_array[left][1]  # Return True and the index
-    return False, -1  # Return False and -1 if not found
+    i = 0  # Index for reference
+    j = 0  # Index for string (pattern)
+
+    while i < n:
+        if string[j] == reference[i]:
+            i += 1
+            j += 1
+
+        if j == m:
+            return True, i - j  # Match found, return starting index of the match
+        elif i < n and string[j] != reference[i]:
+            if j != 0:
+                j = lps[j - 1]
+            else:
+                i += 1
+
+    return False, -1  # No match found
 
 
 def choose_boundaries(max_length):

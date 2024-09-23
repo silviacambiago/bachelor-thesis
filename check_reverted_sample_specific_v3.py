@@ -1,3 +1,5 @@
+import time  # Import the time module
+
 def read_fasta(file_path):
     """
     Reads a sequence from a FASTA file.
@@ -8,12 +10,14 @@ def read_fasta(file_path):
     Returns:
     str: The sequence extracted from the FASTA file.
     """
+
     sequence = []
     with open(file_path, 'r') as file:
         for line in file:
             if not line.startswith('>'):
                 sequence.append(line.strip())
-    return ''.join(sequence)
+    result = ''.join(sequence)
+    return result
 
 
 def check_reverted_sample_specific(indexes, lengths, sample_specific_strings, target, reference):
@@ -35,6 +39,8 @@ def check_reverted_sample_specific(indexes, lengths, sample_specific_strings, ta
     # Ask the user to choose the boundaries
     l, r = choose_boundaries(len(sample_specific_strings))
 
+    start_time = time.time()  # Start timing the inversion detection
+
     for i in range(l, r):
         j = indexes[i]
         k = indexes[i + 1]
@@ -43,7 +49,6 @@ def check_reverted_sample_specific(indexes, lengths, sample_specific_strings, ta
             continue
 
         middle = target[j + lengths[i]:k]
-
         middle = revert_and_complement(middle)
 
         found, start = check_substring(reference, middle)
@@ -71,6 +76,9 @@ def check_reverted_sample_specific(indexes, lengths, sample_specific_strings, ta
             inversion = target[j + lengths[i] - left_increment + 1: k + right_increment]
             reverted.append(inversion)
 
+    end_time = time.time()  # End timing
+    print(f"Time taken to execute: {end_time - start_time:.4f} seconds")
+
     return reverted
 
 
@@ -88,6 +96,7 @@ def build_sample_specific_data(target, file_path):
                     - List of lengths
                     - List of sample-specific strings.
     """
+
     indexes = []
     lengths = []
     sample_specific_strings = []
@@ -206,7 +215,7 @@ def choose_boundaries(max_length):
             print("Invalid input. Please enter integer values.")
 
 
-# Test the function with .fa files
+# Test the function 
 reference_file = "reference.fa"
 target_file = "target.fa"
 specifics_file = "specifics.txt"

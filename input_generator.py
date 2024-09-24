@@ -45,7 +45,6 @@ def insert_multiple_reverted_complements(dna_string, segments):
     Returns:
     str: The DNA string with the specified parts reverted and complemented.
     """
-    # Process segments in the order they are given
     for start, end in segments:
         substring = dna_string[start:end]
         reverted_complemented = revert_and_complement(substring)
@@ -64,21 +63,21 @@ def write_fasta(filename, header, sequence):
     """
     with open(filename, 'w') as fasta_file:
         fasta_file.write(f">{header}\n")
-        # Write the sequence in lines of 80 characters as is typical in FASTA format
+        # Write the sequence in lines of 80 characters
         for i in range(0, len(sequence), 80):
             fasta_file.write(sequence[i:i+80] + '\n')
 
 # Example usage
-length = 100000  # Length of the DNA string
+length = 1000000  # Length of the DNA string
 random_dna = generate_dna_string(length)
 print("Generated random DNA sequence.")
 
 # Define multiple ranges for reverting and complementing parts of the string
-segments = [(100, 250), (500, 634)]  # Each tuple is a start and end index
+segments = [(50000, 150000), (800000, 900000), (600000, 700000), (400000, 500000)]  # Each tuple is a start and end index
 
 # Insert multiple reverted and complemented segments
 modified_dna = insert_multiple_reverted_complements(random_dna, segments)
-print("DNA string modified with multiple reverted and complemented segments.")
+print("DNA string modified with reverted and complemented segments.")
 
 # Write original and modified sequences to FASTA files
 write_fasta("reference.fa", "R", random_dna)

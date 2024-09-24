@@ -215,7 +215,7 @@ def choose_boundaries(max_length):
             print("Invalid input. Please enter integer values.")
 
 
-# Test the function 
+# Test the function
 reference_file = "reference.fa"
 target_file = "target.fa"
 specifics_file = "specifics.txt"

@@ -1,0 +1,32 @@
+Examples tried:
+
+sample_specific_strings = ["GTA", "CCC"]
+target = "ACGTAACCC"
+reference = "ACGGTTACCGTTAGC"
+
+sample_specific_strings = ["TCGG", "TA"]
+target = "TTCGGACTAAC"
+reference = "TCGATTCAGTCCAACGGAT"
+
+sample_specific_strings = ["TTCG", "TA"]
+target = "TTCGGACTAAC"
+reference = "TCGATTCAGTCCAACGGAT"
+
+sample_specific_strings = ["AC", "TTC"]
+target = "ACAATTTCT"
+reference = "AGAAAATTGCTC"
+
+sample_specific_strings = ["AC", "TTC", "CGC", "GAAT"]
+target = "ACAATTTCTCAGGATCGCTACGAAT"
+reference = "AGAAAATTGCTCAGGATCTCGTAGCAT"
+
+sample_specific_strings = ["AAAC", "GTC"]
+target = "AAAACCCGGGTCC"
+reference = "AACCCGGGTTTCCAAATTTGC"*
+
+*[output: 
+AA and GT are breakpoints of an inversion
+AA and GT are breakpoints of an inversion
+Inverted Sequences: ['CCCGGGTT', 'CCCGGGT']
+]
+

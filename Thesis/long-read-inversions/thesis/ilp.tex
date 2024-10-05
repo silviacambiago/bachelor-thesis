@@ -1,0 +1,293 @@
+\newtheorem{theorem}{Theorem}
+\renewcommand\proofname{Proof}
+\begin{algorithm}
+\caption{Check For Inversions Using Sample-Specific Strings}
+\hspace*{\algorithmicindent} \textbf{Input: } \text{indexes}: list of integers, \text{lengths}: list of integers, \text{sample\_specific\_strings}: list of strings, \text{target}: string, \text{reference}: string \\
+\hspace*{\algorithmicindent} \textbf{Output: } list of reverted sequences found in \text{target}
+
+\begin{algorithmic}[1]
+
+\STATE \text{reverted} $\gets$ [ ]
+
+\FOR{$i \gets 1$ \TO $\text{sample\_specific\_strings.length} - 1$}
+    \STATE $j \gets \text{indexes}[i]$
+    \STATE $k \gets \text{indexes}[i + 1]$
+    
+    \IF{$j == -1$ \OR $k == -1$}
+        \STATE \textbf{CONTINUE}
+    \ENDIF
+ 
+    \STATE \text{middle} $\gets$ \text{target}$[j + \text{lengths}[i]:k]$
+    \IF{$\text{middle} == \emptyset$}
+        \STATE \textbf{CONTINUE}
+    \ENDIF
+
+    \STATE \text{middle} $\gets$ \textbf{REVERT\_AND\_COMPLEMENT}(\text{middle})
+    \STATE (\text{found}, \text{start}) $\gets$ \textbf{CHECK\_SUBSTRING}(\text{reference}, \text{middle})
+
+    \IF{\text{found}}
+        \STATE \text{left\_increment} $\gets 1$
+        \WHILE{$\text{left\_increment} \leq \text{lengths}[i]$ \AND $(j + \text{lengths}[i] - \text{left\_increment}) \geq 0$ \AND \text{target}$[j + \text{lengths}[i] - \text{left\_increment}] == \textbf{REVERT\_AND\_COMPLEMENT}(\text{reference}[\text{start} + \text{middle.length} + \text{left\_increment} - 1])$}
+            \STATE \text{left\_increment} $\gets \text{left\_increment} + 1$ 
+        \ENDWHILE
+        \STATE \text{left\_breakpoint} $\gets$ \text{target}$[j + \text{lengths}[i] - \text{left\_increment}: j + \text{lengths}[i] - \text{left\_increment} + 2]$
+
+        \STATE \text{right\_increment} $\gets 0$
+        \WHILE{$\text{right\_increment} < (\text{reference.length} - \text{start} - \text{middle.length}$ \AND $(k + \text{right\_increment}) < \text{target.length}$ \AND \text{target}$[k + \text{right\_increment}] == \textbf{REVERT\_AND\_COMPLEMENT}(\text{reference}[\text{start} - 1 - \text{right\_increment}])$}
+            \STATE \text{right\_increment} $\gets \text{right\_increment} + 1$
+        \ENDWHILE
+        \STATE \text{right\_breakpoint} $\gets$ \text{target}$[k + \text{right\_increment} - 1: k + \text{right\_increment} + 1]$
+
+        \STATE \textbf{PRINT} ``\textit{left\_breakpoint} and \textit{right\_breakpoint} are breakpoints of an inversion''
+
+        \STATE \text{inversion} $\gets$ \text{target}$[j + \text{lengths}[i] - \text{left\_increment} + 1: k + \text{right\_increment}]$
+        \STATE \textbf{APPEND} \text{reverted} $\gets$ \text{inversion}
+    \ENDIF
+\ENDFOR
+\RETURN \text{reverted}
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+\begin{algorithm}
+\caption{Revert and Complement DNA Sequence}
+\hspace*{\algorithmicindent} \textbf{Input: } DNA sequence: string \\
+\hspace*{\algorithmicindent} \textbf{Output: } reverted and complemented sequence: string
+\begin{algorithmic}[1]
+
+
+\STATE $\text{complements} \gets \{ 'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A' \}$
+\STATE $\text{reverted\_complement} \gets \varepsilon$
+
+\FOR{$i \gets \text{sequence.length} - 1$ \TO $0$}
+    \STATE $base \gets \text{sequence}[i]$
+    \STATE $complement \gets \text{complements}[base]$
+    \STATE $\textbf{APPEND} \text{ reverted\_complement} \gets complement$
+\ENDFOR
+
+\RETURN $\text{reverted\_complement}$
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}
+\caption{Knuth-Morris-Pratt Prefix Function}
+\hspace*{\algorithmicindent} \textbf{Input:} pattern: string \\
+\hspace*{\algorithmicindent} \textbf{Output:} LPS array: list of integers
+
+\begin{algorithmic}[1]
+\STATE $m \gets \text{length of pattern}$
+\STATE $\text{lps} \gets [0] * m$ 
+\STATE $j \gets 0$ 
+\STATE $i \gets 1$
+\WHILE{$i < m$}
+    \IF{$\text{pattern}[i] == \text{pattern}[j]$}
+        \STATE $j \gets j + 1$
+        \STATE $\text{lps}[i] \gets j$
+        \STATE $i \gets i + 1$
+    \ELSE
+        \IF{$j \neq 0$}
+            \STATE $j \gets lps[j - 1]$
+        \ELSE
+            \STATE $lps[i] \gets 0$
+            \STATE $i \gets i + 1$
+        \ENDIF
+    \ENDIF
+\ENDWHILE
+\RETURN $\text{lps}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Check Substring Using Knuth-Morris-Pratt}
+\hspace*{\algorithmicindent} \textbf{Input:} reference: string, string: string \\
+\hspace*{\algorithmicindent} \textbf{Output:} Tuple of boolean (True if string is a substring of reference) and integer (starting index if found, -1 otherwise)
+
+\begin{algorithmic}[1]
+\STATE $n \gets \text{length of reference}$
+\STATE $m \gets \text{length of string}$
+\STATE $\text{lps} \gets \text{KMP-Prefix/Function}(\text{string})$
+
+\STATE $i \gets 0$ 
+\STATE $j \gets 0$ 
+
+\WHILE{$i < n$}
+    \IF{$\text{string}[j] == \text{reference}[i]$}
+        \STATE $i \gets i + 1$
+        \STATE $j \gets j + 1$
+    \ENDIF
+
+    \IF{$j == m$}
+        \RETURN $(\text{True}, i - j)$ 
+    \ELSIF{$i < n$ \AND $\text{string}[j] \neq \text{reference}[i]$}
+        \IF{$j \neq 0$}
+            \STATE $j \gets \text{lps}[j - 1]$
+        \ELSE
+            \STATE $i \gets i + 1$
+        \ENDIF
+    \ENDIF
+\ENDWHILE
+\RETURN $(\text{False}, -1)$ 
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+\section{Algorithm Overview}
+
+The algorithm's primary objective is to detect reverted sequences within a target DNA sequence, which are characterized by segments that have been inverted and complemented relative to a reference DNA sequence. \\
+It uses sample-specific strings as possible anchors of an inverted portion occurring in the target. The definition of sample-specific string is as follows:
+
+\begin{definition}[Sample-specific string]
+A sample-specific string S is a string that occurs in the target DNA string T, does not occur in the reference DNA string R, and for every string S' which is a substring of S, S' occurs in the reference string R. 
+\label{thm:sample_specific}
+\end{definition} 
+The key components of the algorithm are:
+
+\begin{itemize}
+    \item Target Sequence: the DNA sequence in which the algorithm looks for reverted sequences. It is a long read extracted from the reference sequence;
+    \item Reference Sequence: the DNA sequence used as a baseline to identify reverted sequences in the target;
+    \item Sample-specific strings: see Definition \ref{thm:sample_specific}. They expected to appear in order within the target sequence;
+\end{itemize}
+
+
+
+
+\section{High-Level Explanation}
+
+This algorithm is structured in a way that involves different phases, detailed as follows:
+
+\begin{itemize}
+    \item \textbf{Setup: } in this phase the working environment is set up, and relevant data structures are prepared in order to store relevant results. Given a target sequence \( S \) and a reference sequence \( R \), let \( I = \{ i_1, i_2, \dots , i_n \} \) denote the list of indexes where sample-specific strings occur in \( S \), and let \( L = \{ l_1, l_2, \dots , l_n \} \) be the list of their corresponding lengths. Additionally, an empty list, \( reverted \), is initialized to store any detected inverted sequences.
+    \item \textbf{Iteration through sample-specific strings: } the algorithm focuses on the prime candidate for detecting inversions, which is the segment that lies between a couple of sample-specific strings. Therefore, the core of the algorithm involves iterating through each  pair of adjacent sample-specific strings.  It confronts every pair \( (x, y) \) of sample-specific strings within the range, where \( x = S[i_j : i_j + l_j] \) and \( y = S[i_{j+1} : i_{j+1} + l_{j+1}] \), and extracts the segment \( m \) that lies exactly in the middle of the two sample-specific strings \( x \) and \( y \). More precisely, \( m = S[i_j + l_j : i_{j+1}] \). The extracted segment \( m \) represents the region that could potentially be the inversion.
+    \item \textbf{Reversing and Complementing: } when handling genomic data, an inversion is not just a reversal of the nucleotide sequence, but it also involves the complementing of bases, as seen on Chapter 2. After extracting the segment in the middle \( m \), its reverse complement \( m_r \) can be easily obtained: first, the bases in \( m \) are reversed, then each base is replaced with its complement. The segment \( m_r \) is the transformed version of \( m \) that allows the algorithm to search for inverted regions in \( R \). 
+    \item \textbf{Search for the Reverse Complement in the Reference String: } the logic behind this step is that if \( m \) is actually an inverted segment, this means that its reverse and complement \( m_r \) can be found within the reference \( R \), since \( R \) represents the original, non-inverted version of the sequence. To efficiently locate \( m_r \) in \( R \), the algorithm uses the Knuth-Morris-Pratt (KMP) algorithm, detailed in Chapter 2. This method is used in combination with a prefix function, the longest prefix suffix array (LPS) that avoids unnecessary character comparisons. It preprocesses the pattern \( m_r \), creating an array that stores the lengths of the longest prefixes of the pattern that are also suffixes. When a mismatch occurs, the algorithm uses this information to skip ahead in the pattern, making the whole process more efficient. If \( m_r \) is found in \( R \), the starting index \( s \) of the occurrence of \( m_r \) in \( R \) is stored for further analysis. 
+    \item \textbf{Identification of Breakpoints: } the identifications of breakpoints is essential to precisely locate the boundaries of the inversion within the target sequence \( S \). So, if the reverse complement \( m_r \) is found in \( R \), the algorithm proceeds to identify the inversion breakpoints, that define the boundaries of the inverted segment in \( S \). The breakpoints are determined by comparing characters from \( S \) and \( R \) in two stages:
+    \begin{itemize}
+    	\item \textbf{Left Breakpoint Identification: } starting from the last character of the first sample-specific string \( x \) in \( S \), that corresponds to \( S[i_j + l_j] \) and the first character immediately following \( m_r \) in \( R \), which is \( R[s + m_r .length] \), the algorithm compares corresponding characters from \( S \) and the reverse complement of \( R \). This comparison continues backward in \( S \) and forward in \( R \) until a mismatch occurs. At this point, the final position in \( S \) is marked as left breakpoint.
+    	\item \textbf{Right Breakpoint Identification: } the right breakpoint is determined symmetrically. The comparison starts from the first character of the second sample-specific string \( y \) in \( S \), \( S[i_{j+1}] \), and the character immediately preceding \( m_r \) in \( R \), \( R[s - 1] \), and the search proceeds forward in \( S \) and backward in \( R \) until a mismatch is found, marking the right breakpoint in \( S \). 
+    \end{itemize}
+\end{itemize}
+
+\section{Conditions for Proper Functioning}
+
+The correctness of this algorithm is ensured if the middle segment extracted from the target is sufficiently long to ensure its uniqueness within the reference sequence. This  is crucial because if the middle segment is too short, it might match multiple locations within the reference sequence, leading to potential misalignment. This  can result in the algorithm identifying incorrect breakpoints or even falsely identifying an inversion that does not actually exist, hence a false positive. \\
+In addition to this, for the algorithm to function properly, the target sequence, and particularly the middle segment, must be free of errors or mutations. In fact, even a single error within the middle segment can disrupt the transformation process, where the segment is reversed and complemented. As a result, the transformed segment may not match the expected part of the reference sequence, leading to false negatives where actual inversions are missed. 
+\section{Edge Cases}
+An important edge case to consider occurs when two sample-specific strings appear consecutively without any intervening characters in the target string. In this scenario, the middle segment will be an empty string. This happens because there are no characters between the end of the first sample-specific string and the beginning of the second one. For example:
+\begin{itemize}
+    \item \textbf{Sample-specific strings: } 'S1', 'S2'
+    \item \textbf{Target string: }  '\dots S1S2\dots'
+\end{itemize}
+
+In this case the starting index of 'S1' is \textit{j} and the starting index of 'S2' is \textit{k}, making the middle segment target[j + S1.length : k], which evaluates to an empty string.
+
+\section{Proof of Correctness}
+
+Now that the algorithm has been explained in detail, the proof of its correctness will be provided. \\
+Let \( S = xyz \) be a string, where \( x \), \( y \), and \( z \) are substrings of \( S \): Let also \(y^r \) be the reversal of \( y \), the aim is to demonstrate that it is possible to reconstruct the sequence \( S' = z^r y^r x^r \), where the superscript '\( r \)' indicates the reversal of a string. For the sake of simplicity, the complement will be ignored. The proof will be made using mathematical induction. 
+
+\begin{figure}[h]
+
+  \centering
+    \includegraphics[width=300px]{rev.png}
+
+  \caption{\( R \) represents the reference string, that in the following demonstration will be referred as \( S \), and \( T \) is the target where the inversion is found, that will be later referred as \( S' \)}
+  \label{fig:rev}
+
+\end{figure}
+
+\begin{theorem}
+    For any string \( S = xyz \), where \( x \), \( y \), \( z \) are substrings of \( S \), given \(y^r \), reversal of \(y\), it is possible to reconstruct the sequence \( S' = z^r y^r x^r \). 
+\end{theorem}
+\begin{proof}
+\\ 
+\textbf{Base case: } \|\( y \)\| = 1 \\
+\\ Let \( \| y \| = 1 \), meaning \( y \) only consists of a single character '\( a \)'. In this trivial case, \( S = xaz \), and \(y^r \) = \( a \). Hence, the string \( S' = z^r y^r x^r \) can be reconstructed as follows: 
+\begin{enumerate}
+\item Reverse \( z \) to obtain \( z^r \);
+\item Append \( y^r \), which is simply '\( a \)';
+\item Append the reversal of \( x \), which is \( x^r \).
+\end{enumerate}
+The resulting sequence \( S' \) is \(z^r a x^r \), equivalent to \( S' = z^r y^r x^r \) when \|\( y \)\| = 1. \\
+\\ \textbf{Inductive step: } \( \| y \| > 1 \) \\
+
+\\ Assume that for some \( k > 1 \), it is possible to reconstruct \( S' = z^r y^r x^r \) when \( \| y \| = k \) (inductive hypothesis). It will be proven that this reconstruction is also possible when \( \| y \| = k + 1 \). 
+
+Let \( y = a_1 a_2 \dots a_k a_{k+1} \), where each \( a_i \) is a single character. Thus, \( y^r = a_{k+1} a_k \dots a_2 a_1 \). According to the inductive hypothesis, it is possible to reconstruct \( S' = z^r (a_1 a_2 \dots a_k)^r x^r \). In order to obtain \( S' = z^r y^r x^r \) for \( \| y \| = k + 1 \), the following steps are necessary:
+\begin{enumerate}
+    \item Start with \( z^r (a_k \dots a_2 a_1) x^r \);
+    \item Insert \( a_{k+1} \) before \( a_k \dots a_2 a_1 \);
+\end{enumerate}
+The result is \( z^r (a_1 a_2 \dots a_k a_{k+1})^r x^r \), which corresponds to \( S' = z^r y^r x^r \) for \( \| y \| = k + 1 \).
+\end{proof}
+
+\section{Time and Space Complexity}
+Now, the time and space complexity of the algorithm will be analyzed. \\
+Starting with the first one, during the initialization phase, the necessary parameters are set up, and the list to store the reverted sequences is initialized. These steps are performed in constant time, hence $\mathcal{O}(1)$. \\
+
+In the iteration phase, each pair of sample-specific strings is processed. Let \( n \) denote the total number of sample-specific strings, each interaction involves the extraction of the segment \( m \) between two adjacent sample-specifics strings. This step is repeated for each pair, and extracting the segment takes time proportional to its average length $\bar{m}$, so the overall time complexity of this phase is $\mathcal{O}(n \cdot \bar{m} )$. \\
+
+In the following phase, the segment in the middle is transformed by reverting its characters and complementing each base. This operation takes $\mathcal{O}( \bar{m})$ time per iteration, so the overall time complexity of this phase is, just like the previous one, $\mathcal{O}(n \cdot \bar{m} )$. \\
+
+For the search in the reference string, the Knuth-Morris-Pratt algorithm is used to locate the transformed segment \( m_r \) within the reference \( R \). First, the LPS array is constructed. The array is initialized of size \( m \), where \( m \) is the length of the pattern. Keeping in mind that this data can vary when multiple inversions having different lengths are found during the whole computation, the actual value to analyze is the average length \( \bar{m} \).  Then, the algorithm iterates through the pattern and the LPS array is filled based on the comparison of the characters in the pattern. Each character is processed at most twice: once when a match is found, and again if a mismatch occurs (when the pointer \( j \) is reset based on the LPS array). Therefore, the time complexity required for the LPS computation is $\mathcal{O}(\bar{m})$, hence linear. \\
+Once built the LPS array, the actual search of the substring begins, iterating over the characters in the reference string while using the information in the LPS array in order to skip unnecessary comparisons. Each character in the reference string is processed at most once. Additionally, the character comparisons are skipped according to the values in the LPS array. Therefore, said \( r \) the length of the reference, the time complexity of the search is  $r + \mathcal{O}(\bar{m})$, which also makes the total time complexity of the whole phase. \\
+
+In the last phase, the algorithm identifies the left and right breakpoints, which requires comparing characters in both target and reference sequences. Considering the search of the left breakpoint, where the algorithm starts at the last character of the first sample-specific string in the target and the character immediately following the segment in the middle segment extracted in the reference, the number of comparisons performed depends on the length of the first sample-specific string. Said \( s \) such length, in the worst case scenario, the algorithm compares \( s \) characters. The process is the same for the right breakpoint, but the length of the second sample-specific string may differ. Therefore, the time complexity must be proportional to the average length of the sample-specific strings, that will be referred as $\bar{s}$. Since the algorithm iterates over \( n \) sample-specific strings, the total time complexity of this phase is $\mathcal{O}(n \cdot \bar{s} )$. \\
+
+The overall time complexity is determined combining all the phases. Therefore, it can be expressed as $\mathcal{O}(n \cdot \bar{m} + n \cdot \bar{m} + r + \bar{m} + n \cdot \bar{s})$ and summarized as $\mathcal{O}(n \cdot \bar{m} + r + \bar{m} + n \cdot \bar{s})$. In this scenario, $\bar{m}$ is considerably smaller than the reference length  \( r \), and the same can be said for the average length of the sample specific strings \( \bar{s} \). So, the dominant terms that actually determine the total time complexity of the algorithm are $n \cdot \bar{m}$ and \( s \). Consequently, the result is $\mathcal{O}(r + n \cdot \bar{m} )$. \\
+
+
+Regarding space complexity, the algorithm requires $\mathcal{O}(n \cdot \bar{m} )$ space to store the list of reverted sequences. Additionally, the LPS array used in the Knuth-Morris-Pratt algorithm demands $\mathcal{O}(\bar{m} )$ space for each segment processed and temporarily stored during the search phase. Temporary variables for indexing and counters occupy $\mathcal{O}(1)$ space. Although the middle segments are not stored long-term, the memory requirements are still significant due to the storage of reverted sequences. Therefore, the overall space complexity of the algorithm is $\mathcal{O}(n \cdot \bar{m} )$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

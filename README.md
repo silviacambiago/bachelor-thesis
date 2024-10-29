@@ -80,13 +80,7 @@ Potential enhancements include extending the algorithm to handle larger, more co
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-## Acknowledgments
-
-Special thanks to my supervisor and committee for their guidance and feedback throughout the research process.
+This project is licensed under the GNU General Public License. See the [LICENSE](LICENSE) file for details.
 
 ---
 

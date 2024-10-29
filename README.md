@@ -1,5 +1,5 @@
 
-# Bachelor Thesis: Detecting Genome Inversions
+# Bachelor Thesis: Detecting Genome Inversions Using Sample-Specific Strings
 
 [![Thesis Repository](https://img.shields.io/badge/GitHub-silviacambiago/bachelor--thesis-blue)](https://github.com/silviacambiago/bachelor-thesis/tree/main)
 
